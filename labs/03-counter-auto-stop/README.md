@@ -156,29 +156,52 @@ halts.
 | `T2_INPUT` | DInt | %MD10 | I/O field, *Timer 2* |
 | `T2_HMI` | DInt | %MD22 | I/O field, *Elapsed* |
 
+### Runtime
+
+Captured in the WinCC RT Simulator against a PLCSIM CPU with `Timer 1 = 3 s`,
+`Timer 2 = 3 s` and `Counter Input = 3`.
+
+![Lamp 1 phase — count still 0](img/hmi-runtime-lamp1.png)
+
+*Lamp 1 phase, first cycle: the left indicator is green, `Count` still 0,
+`Elapsed` under Timer 1 counting.*
+
+![Lamp 2 phase — count still 0](img/hmi-runtime-lamp2.png)
+
+*Lamp 2 phase of the same cycle. The count does not move while lamp 2 is lit —
+it is the falling edge at the end of this phase that increments it.*
+
+![Two cycles counted](img/hmi-runtime-counting.png)
+
+*After two completed cycles: `Count` reads 2 against a `Counter Input` of 3.*
+
 ## Testing
 
-This project has **no watch table** (see Notes), so nothing could be seeded
-from it. The inputs below come from the lab guide's own example values.
+Run on S7-PLCSIM with the WinCC RT Simulator, `Timer 1 = Timer 2 = 3 s`,
+`Counter Input = 3`. The project ships no watch table (F-3.1), so these values
+were entered on the panel. *Actual* records what the captures and the demo
+video show; rows marked **not run** were not exercised in that session.
 
 | # | Test case | Input | Expected | Actual | Result |
 |---|---|---|---|---|---|
-| 1 | Setpoints reach the timers | `T1_INPUT = 5`, `T2_INPUT = 3` | `T1_RESULT = 5000`, `T2_RESULT = 3000` | > ⚠️ TODO | > ⚠️ TODO |
-| 2 | Edge-triggered start | hold `START = TRUE` | lamps advance normally; holding START does not pin lamp 1 on | > ⚠️ TODO | > ⚠️ TODO |
-| 3 | Oscillation | after start | %Q0.0 and %Q0.1 alternate with 5 s / 3 s | > ⚠️ TODO | > ⚠️ TODO |
-| 4 | Count increments once per cycle | `COUNTER_INPUT = 5`, run 3 cycles | `COUNTER_DISPLAY = 3` | > ⚠️ TODO | > ⚠️ TODO |
-| 5 | Count does not increment during the lamp-2 phase | mid lamp-2 phase | `COUNTER_DISPLAY` unchanged until lamp 2 goes out | > ⚠️ TODO | > ⚠️ TODO |
-| 6 | Automatic stop at N | `COUNTER_INPUT = 5`, let it run | both lamps clear on the 5th falling edge | > ⚠️ TODO | > ⚠️ TODO |
-| 7 | Counter self-reset | after test 6 | `COUNTER_DISPLAY` returns to 0 | > ⚠️ TODO | > ⚠️ TODO |
-| 8 | Manual stop | `STOP = TRUE` mid-cycle | both lamps clear immediately | > ⚠️ TODO | > ⚠️ TODO |
-| 9 | Count after manual stop (F-3.3) | `STOP` at count 2 | document what `COUNTER_DISPLAY` shows — the guide's "Extra" wants 0 | > ⚠️ TODO | > ⚠️ TODO |
-| 10 | Restart after auto-stop | `START = TRUE` | sequence restarts from lamp 1, count from 0 | > ⚠️ TODO | > ⚠️ TODO |
+| 1 | Setpoints reach the timers | `T1_INPUT = 3`, `T2_INPUT = 3` | `T1_RESULT = 3000`, `T2_RESULT = 3000` | not observed — the `*_RESULT` tags are not on the panel; the phase lengths imply it | not run |
+| 2 | Edge-triggered start | hold `START` | lamps advance normally; holding START does not pin lamp 1 on | not exercised — START was pressed and released | not run |
+| 3 | Oscillation | after start | %Q0.0 and %Q0.1 alternate | alternation observed over three cycles (captures, demo) | **Pass** |
+| 4 | Count increments once per cycle | `Counter Input = 3`, let it run | `Count` reaches 1, then 2, then 3 | `Count` steps 0 → 1 → 2 across the demo, once per completed cycle | **Pass** |
+| 5 | Count does not increment during the lamp-2 phase | mid lamp-2 phase | `Count` unchanged until lamp 2 goes out | both lamp-2 captures show the count unchanged from the preceding lamp-1 phase | **Pass** |
+| 6 | Automatic stop at N | `Counter Input = 3`, let it run | both lamps clear on the 3rd falling edge | both indicators go red and stay red at the end of the demo, with no STOP press | **Pass** |
+| 7 | Counter self-reset | after test 6 | `Count` returns to 0 | `Count` reads 0 in the same frame as the stop | **Pass** |
+| 8 | Manual stop | `STOP` mid-cycle | both lamps clear immediately | not exercised — the run ended on the automatic stop | not run |
+| 9 | Count after manual stop (F-3.3) | `STOP` at count 2 | the guide's "Extra" wants `Count` back to 0 | not exercised; the ladder has no path from `STOP` to the counter's `R`, so this is expected to fail | not run |
+| 10 | Restart after auto-stop | `START` again | sequence restarts from lamp 1, count from 0 | not exercised | not run |
 
 ## Demo
 
-[![Lab 3 demo](img/hmi-root-screen.png)](https://example.com/TODO-lab3-video)
+[![Lab 3 demo — click to play](img/hmi-runtime-counting.png)](../../videos/lab-03-demo.mp4)
 
-> ⚠️ TODO — record the demo, upload it unlisted, and replace the URL.
+[`videos/lab-03-demo.mp4`](../../videos/lab-03-demo.mp4) — 32 s, screen
+recording of the RT Simulator: start, three counted cycles, then the automatic
+stop with the counter clearing itself.
 
 ## Notes
 

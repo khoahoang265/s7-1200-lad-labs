@@ -263,37 +263,64 @@ field devices means deleting FC4 and mapping `HIGH`/`LOW` to `%I` inputs.
 | `PUMP` | Bool | `PUMP` %Q0.0 | Pump symbol and indicator lamp |
 | `VALVE` | Bool | `VALVE` %Q0.1 | Valve indicator lamp |
 
+### Runtime
+
+Captured in the WinCC RT Simulator against a PLCSIM CPU.
+
+![Automatic mode — pump running, tank filling](img/hmi-runtime-auto-filling.png)
+
+*Automatic mode: the `Auto` lamp is green, `AUTOMATIC` is running, the pump
+indicator is lit and the bar shows the tank about half full.*
+
+![Automatic mode — tank at 100 %, pump off, dwell timer running](img/hmi-runtime-auto-dwell.png)
+
+*The level has reached 100 %, so `HIGH` has reset the pump — the pump
+indicator is dark — and `TIMER 1` is counting the 5 s dwell before the valve
+opens.*
+
+![Manual mode — pump driven by hand, automatic sequence stopped](img/hmi-runtime-manual.png)
+
+*Manual mode: the `Manual` lamp is green, the `Auto` lamp dark, the
+`AUTOMATIC` running lamp is dark — the automatic sequence is disabled — yet
+the pump runs from the manual button. This is the mode switch behaving as a
+selector, and it is what settled finding F-4.1.*
+
 ## Testing
 
-Inputs are seeded from `Watch table_1` in the project.
+Run on S7-PLCSIM with the WinCC RT Simulator. *Actual* records what the
+captures and the demo video show; rows marked **not run** were not exercised
+in that session.
 
 | # | Test case | Input | Expected | Actual | Result |
 |---|---|---|---|---|---|
-| 1 | Clock memory is enabled | download and go online | `Clock_5Hz` %M0.1 toggles | > ⚠️ TODO | > ⚠️ TODO |
-| 2 | Automatic latch | `AUTOMATIC_START = TRUE`, then FALSE | `AUTOMATIC_RUN = 1` and holds | > ⚠️ TODO | > ⚠️ TODO |
-| 3 | Cold start from an empty tank | `WATER_LEVEL = 0`, then START | `AUTOMATIC_PUMP = 1`, `AUTOMATIC_VALVE = 0` | > ⚠️ TODO | > ⚠️ TODO |
-| 4 | Cold start with water present | preset `WATER_LEVEL = 40`, then START | `AUTOMATIC_VALVE = 1`, `AUTOMATIC_PUMP = 0` (flush first) | > ⚠️ TODO | > ⚠️ TODO |
-| 5 | Fill to 100 % | after test 3 | `WATER_LEVEL` rises to 100, `HIGH = 1`, `AUTOMATIC_PUMP = 0` | > ⚠️ TODO | > ⚠️ TODO |
-| 6 | Dwell at 100 % | after test 5 | `TIMER1_DISPLAY` counts 0→5, then `AUTOMATIC_VALVE = 1` | > ⚠️ TODO | > ⚠️ TODO |
-| 7 | Drain to 0 % | after test 6 | `WATER_LEVEL` falls to 0, `LOW = 0`, `AUTOMATIC_VALVE = 0` | > ⚠️ TODO | > ⚠️ TODO |
-| 8 | Dwell at 0 % | after test 7 | `TIMER2_DISPLAY` counts 0→5, then `AUTOMATIC_PUMP = 1` | > ⚠️ TODO | > ⚠️ TODO |
-| 9 | Automatic stop | `AUTOMATIC_STOP = FALSE`→pressed | `AUTOMATIC_RUN = 0`, `PUMP = 0`, `VALVE = 0` | > ⚠️ TODO | > ⚠️ TODO |
-| 10 | Mode switch is exclusive | `AUTOMATIC_MANUAL = TRUE` | automatic enabled, manual dead; at FALSE the reverse | > ⚠️ TODO | > ⚠️ TODO |
-| 11 | Manual pump | mode = manual, `MANUAL_PUMP_START` | `PUMP = 1`, level rises | > ⚠️ TODO | > ⚠️ TODO |
-| 12 | Manual pump interlock | manual pump on, level reaches 100 | `MANUAL_PUMP = 0` — pump drops out | > ⚠️ TODO | > ⚠️ TODO |
-| 13 | Manual valve interlock | manual valve on, level reaches 0 | `MANUAL_VALVE = 0` — valve drops out | > ⚠️ TODO | > ⚠️ TODO |
-| 14 | Level clamps | run both actuators to their limits | `WATER_LEVEL` never exceeds 100 nor goes below 0 | > ⚠️ TODO | > ⚠️ TODO |
-| 15 | Bar display tracks the level | during a full cycle | HMI bar follows `WATER_LEVEL` smoothly | > ⚠️ TODO | > ⚠️ TODO |
+| 1 | Clock memory is enabled | download and run | `Clock_5Hz` %M0.1 toggles | the tank level moves continuously while an actuator is on, which only happens if the clock bit is toggling | **Pass** |
+| 2 | Automatic latch | `AUTOMATIC START` pressed, then released | `AUTOMATIC_RUN = 1` and holds | the `AUTOMATIC` lamp stays lit for the whole cycle after one press | **Pass** |
+| 3 | Cold start from an empty tank | tank at 0, then START | pump on, valve off | pump lit and the bar rises from empty (demo 0:05) | **Pass** |
+| 4 | Cold start with water present | preset the level, then START | valve opens first to flush | not exercised — the run started from an empty tank | not run |
+| 5 | Fill to 100 % | after test 3 | level reaches 100, `HIGH = 1`, pump off | bar reaches full and the pump indicator goes dark (capture, demo 0:26) | **Pass** |
+| 6 | Dwell at 100 % | after test 5 | `TIMER 1` counts to 5, then the valve opens | `TIMER 1` reads 3 mid-dwell and the valve is running by 0:37 | **Pass** |
+| 7 | Drain to 0 % | after test 6 | level falls to 0, valve closes | bar empties and the valve indicator goes dark (demo 0:58) | **Pass** |
+| 8 | Dwell at 0 % | after test 7 | `TIMER 2` counts to 5, then the pump restarts | `TIMER 2` seen counting at the empty tank; the run switched to manual before the next fill | **Pass** (partial) |
+| 9 | Automatic stop | `AUTOMATIC STOP` pressed | `AUTOMATIC_RUN = 0`, both actuators off | not exercised — the run ended by switching to manual | not run |
+| 10 | Mode switch is exclusive | flip the switch to Manual | automatic disabled, manual enabled | the `AUTOMATIC` lamp goes dark while the manual actuator keeps running (capture, demo 1:09) | **Pass** |
+| 11 | Manual pump | mode = manual, `PUMP START` | pump runs, level rises | pump indicator lit in manual mode with the automatic sequence stopped (capture) | **Pass** |
+| 12 | Manual pump interlock | manual pump on, level reaches 100 | `MANUAL_PUMP = 0` — pump drops out | not exercised | not run |
+| 13 | Manual valve interlock | manual valve on, level reaches 0 | `MANUAL_VALVE = 0` — valve drops out | not exercised | not run |
+| 14 | Level clamps | run both actuators to their limits | level never exceeds 100 nor goes below 0 | the bar sits at full and at empty without overshooting in either direction | **Pass** |
+| 15 | Bar display tracks the level | during a full cycle | the bar follows `WATER_LEVEL` | the bar rises and falls smoothly through the whole demo | **Pass** |
 
 > The project's watch table also lists `POSITIVE_SIGNAL_EDGE` with a modify
 > value of FALSE. Writing an edge-memory bit by hand is a debugging aid, not a
-> test case — do not treat row 3 of the watch table as a scenario.
+> test case — row 3 of the watch table is not a scenario.
 
 ## Demo
 
-[![Lab 4 demo](img/hmi-root-screen.png)](https://example.com/TODO-lab4-video)
+[![Lab 4 demo — click to play](img/hmi-runtime-auto-filling.png)](../../videos/lab-04-demo.mp4)
 
-> ⚠️ TODO — record the demo, upload it unlisted, and replace the URL.
+[`videos/lab-04-demo.mp4`](../../videos/lab-04-demo.mp4) — 85 s, screen
+recording of the RT Simulator: a complete automatic cycle (fill → dwell →
+drain → dwell), then the switch to manual with the pump and valve driven by
+hand.
 
 ## Notes
 

@@ -140,30 +140,51 @@ dark. START re-enters at green.
 | `T2_HMI` | DInt | %MD22 | I/O field, *TIME ELAPSED · T2 (s)* |
 | `T3_HMI` | DInt | %MD30 | I/O field, *TIME ELAPSED · T3 (s)* |
 
+### Runtime
+
+All three phases, captured in the WinCC RT Simulator against a PLCSIM CPU with
+`T1 = T2 = T3 = 5 s`.
+
+![Green phase — LAMP_1 lit, PLCSIM in RUN](img/hmi-runtime-green.png)
+
+*Green phase, with the TIA project tree and the PLCSIM panel in frame: the CPU
+is in RUN with no ERROR, and `TIME ELAPSED · T1` reads 4 of 5 s.*
+
+![Yellow phase — LAMP_2 lit](img/hmi-runtime-yellow.png)
+
+*Yellow phase. `LAMP_1` has dropped, `LAMP_2` is lit, and the elapsed counter
+has moved from T1 to T2.*
+
+![Red phase — LAMP_3 lit](img/hmi-runtime-red.png)
+
+*Red phase — the last step before the ring closes back to green.*
+
 ## Testing
 
-The project's watch table was never updated from Lab 1 (see Notes), so it
-supplies only `T1_INPUT = 5` and `T2_INPUT = 3`; the T3 value below is a
-suggestion.
+Run on S7-PLCSIM with the WinCC RT Simulator, `T1 = T2 = T3 = 5 s` — not the
+values in the project's stale watch table. *Actual* records what the captures
+and the demo video show; rows marked **not run** were not exercised in that
+session.
 
 | # | Test case | Input | Expected | Actual | Result |
 |---|---|---|---|---|---|
-| 1 | Setpoints reach the timers | `T1=5`, `T2=3`, `T3=4` | `T1_INPUT_RESULT = 5000`, `T2_INPUT_RESULT = 3000`, `T3_INPUT_RESULT = 4000` | > ⚠️ TODO | > ⚠️ TODO |
-| 2 | Start | `START = TRUE`, then FALSE | `LAMP_1 = 1`, `LAMP_2 = 0`, `LAMP_3 = 0` | > ⚠️ TODO | > ⚠️ TODO |
-| 3 | Green → yellow | after 5 s | `LAMP_1 = 0`, `LAMP_2 = 1` | > ⚠️ TODO | > ⚠️ TODO |
-| 4 | Yellow → red | after a further 3 s | `LAMP_2 = 0`, `LAMP_3 = 1` | > ⚠️ TODO | > ⚠️ TODO |
-| 5 | Red → green (ring closes) | after a further 4 s | `LAMP_3 = 0`, `LAMP_1 = 1` | > ⚠️ TODO | > ⚠️ TODO |
-| 6 | Only one lamp at a time | throughout a full cycle | exactly one of %Q0.1–%Q0.3 is high at any moment | > ⚠️ TODO | > ⚠️ TODO |
-| 7 | Elapsed displays | mid cycle | the running phase's `Tn_HMI` counts up in seconds, the others hold 0 | > ⚠️ TODO | > ⚠️ TODO |
-| 8 | Stop mid-cycle | `STOP = TRUE` during yellow | all three lamps 0, all timers reset | > ⚠️ TODO | > ⚠️ TODO |
-| 9 | Restart after stop | `START = TRUE` | sequence restarts at green, not at yellow | > ⚠️ TODO | > ⚠️ TODO |
-| 10 | Real literal in `MUL` (F-2.1) | compile the project | compiles with no warning about `1000.0` | > ⚠️ TODO | > ⚠️ TODO |
+| 1 | Setpoints reach the timers | `T1 = T2 = T3 = 5` | `T1_INPUT_RESULT = T2_INPUT_RESULT = T3_INPUT_RESULT = 5000` | not observed — the `*_RESULT` tags are not on the panel; equal phase lengths imply it | not run |
+| 2 | Start | `START` pressed, then released | `LAMP_1 = 1`, `LAMP_2 = 0`, `LAMP_3 = 0` | green lights alone and stays lit after release (capture, demo) | **Pass** |
+| 3 | Green → yellow | after 5 s | `LAMP_1 = 0`, `LAMP_2 = 1` | handover observed (capture, demo) | **Pass** |
+| 4 | Yellow → red | after a further 5 s | `LAMP_2 = 0`, `LAMP_3 = 1` | handover observed (capture, demo) | **Pass** |
+| 5 | Red → green (ring closes) | after a further 5 s | `LAMP_3 = 0`, `LAMP_1 = 1` | the demo runs past red back to green with no further input | **Pass** |
+| 6 | Only one lamp at a time | throughout a full cycle | exactly one of %Q0.1–%Q0.3 is high at any moment | all three captures and every frame of the demo show exactly one lit circle | **Pass** |
+| 7 | Elapsed displays | mid cycle | the running phase's `Tn_HMI` counts up, the others hold 0 | green capture: T1 = 4, T2 = 0, T3 = 0; the counter follows the active phase | **Pass** |
+| 8 | Stop mid-cycle | `STOP` during yellow | all three lamps 0, all timers reset | not exercised | not run |
+| 9 | Restart after stop | `START` again | sequence restarts at green, not at yellow | not exercised | not run |
+| 10 | Real literal in `MUL` (F-2.1) | compile and download | project compiles and runs | compiled, downloaded and ran on PLCSIM — RUN lit, ERROR dark (capture) | **Pass** |
 
 ## Demo
 
-[![Lab 2 demo](img/hmi-root-screen.png)](https://example.com/TODO-lab2-video)
+[![Lab 2 demo — click to play](img/hmi-runtime-green.png)](../../videos/lab-02-demo.mp4)
 
-> ⚠️ TODO — record the demo, upload it unlisted, and replace the URL.
+[`videos/lab-02-demo.mp4`](../../videos/lab-02-demo.mp4) — 25 s, screen
+recording of the RT Simulator: start, then green → yellow → red → green.
 
 ## Notes
 

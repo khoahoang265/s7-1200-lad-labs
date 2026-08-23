@@ -8,10 +8,11 @@ water-tank controller split across four function blocks.
 `TIA Portal V16` · `S7-1200 · CPU 1211C AC/DC/Rly · FW V4.4` ·
 `LAD` · `WinCC Basic / KTP700 Basic PN` · `4 labs`
 
-> Every ladder network, tag table and HMI screenshot in this repository was
-> extracted from the TIA Portal project printouts. Test results, runtime
-> screenshots and demo videos are the parts a human still has to supply —
-> see [`SCREENSHOT_CHECKLIST.md`](SCREENSHOT_CHECKLIST.md).
+> Every ladder network, tag table and HMI screen layout in this repository was
+> extracted from the TIA Portal project printouts. The runtime captures, the
+> test results and the demo clips come from running the four projects on
+> S7-PLCSIM with the WinCC RT Simulator; each lab's Testing table marks which
+> cases that session covered and which it did not.
 
 ## Hardware and software
 
@@ -32,7 +33,7 @@ water-tank controller split across four function blocks.
 ```
 .
 ├── README.md                        this file
-├── SCREENSHOT_CHECKLIST.md          what still has to be captured by hand
+├── SCREENSHOT_CHECKLIST.md          capture log: what was shot, what is still open
 ├── LICENSE                          MIT
 ├── .gitignore                       TIA-aware; commit .zap, never the .ap16 folder
 ├── docs/
@@ -44,8 +45,9 @@ water-tank controller split across four function blocks.
 │   ├── 03-counter-auto-stop/        Ex. 1.3 — CTU on a falling edge, RESET_BF
 │   └── 04-water-tank-auto-manual/   Ex. 1.4 — auto/manual, FC split, CTUD
 │       ├── README.md                objective, I/O, per-network walkthrough, tests
-│       ├── img/                     ladder + HMI images rendered from the PDFs
+│       ├── img/                     ladder and HMI images, plus runtime captures
 │       └── src/                     archived TIA project (.zap16) — see .gitignore
+├── videos/                          one demo clip per lab (MP4)
 └── assets/                          shared images
 ```
 
@@ -53,15 +55,15 @@ water-tank controller split across four function blocks.
 
 | Lab | Title | Key concepts | Status | Link | Demo |
 |---|---|---|---|---|---|
-| 1 | Alternating lamp with adjustable ON/OFF times | `S`/`R` latch, two `TON`, `MUL`/`DIV` scaling, HMI I/O fields | Logic documented · tests TODO | [labs/01-…](labs/01-alternating-lamp-timers/README.md) | > ⚠️ TODO |
-| 2 | Sequential three-lamp cycle | Timer chaining, ring sequence, three-lamp reset | Logic documented · tests TODO | [labs/02-…](labs/02-sequential-traffic-lights/README.md) | > ⚠️ TODO |
-| 3 | Cycle counter with automatic stop | `N` edge scan, `CTU`, `RESET_BF`, self-resetting counter | Logic documented · tests TODO | [labs/03-…](labs/03-counter-auto-stop/README.md) | > ⚠️ TODO |
-| 4 | Water tank — automatic and manual control | `FC` decomposition, non-optimized `DB`, `CTUD`, clock memory | Logic documented · tests TODO | [labs/04-…](labs/04-water-tank-auto-manual/README.md) | > ⚠️ TODO |
+| 1 | Alternating lamp with adjustable ON/OFF times | `S`/`R` latch, two `TON`, `MUL`/`DIV` scaling, HMI I/O fields | Documented · tested on PLCSIM | [labs/01-…](labs/01-alternating-lamp-timers/README.md) | [16 s](videos/lab-01-demo.mp4) |
+| 2 | Sequential three-lamp cycle | Timer chaining, ring sequence, three-lamp reset | Documented · tested on PLCSIM | [labs/02-…](labs/02-sequential-traffic-lights/README.md) | [25 s](videos/lab-02-demo.mp4) |
+| 3 | Cycle counter with automatic stop | `N` edge scan, `CTU`, `RESET_BF`, self-resetting counter | Documented · tested on PLCSIM | [labs/03-…](labs/03-counter-auto-stop/README.md) | [32 s](videos/lab-03-demo.mp4) |
+| 4 | Water tank — automatic and manual control | `FC` decomposition, non-optimized `DB`, `CTUD`, clock memory | Documented · tested on PLCSIM | [labs/04-…](labs/04-water-tank-auto-manual/README.md) | [85 s](videos/lab-04-demo.mp4) |
 
-Read [`docs/extraction-notes.md#findings`](docs/extraction-notes.md#findings)
-before recording any demo — it lists what did not add up while cross-checking
-the projects against the lab guide: stale watch tables, inverted tag comments,
-mixed literal types, and one unfinished "Extra" task in Lab 3.
+[`docs/extraction-notes.md#findings`](docs/extraction-notes.md#findings) lists
+what did not add up while cross-checking the projects against the lab guide:
+stale watch tables, inverted tag comments, mixed literal types, and one
+unfinished "Extra" task in Lab 3.
 
 ## Getting started
 
