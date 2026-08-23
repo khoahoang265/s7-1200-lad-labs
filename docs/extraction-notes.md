@@ -136,9 +136,10 @@ Read from `… / Local modules`:
 | Integration time | 50 Hz (20 ms) |
 | HMI | KTP700 Basic PN, `HMI_Connection_1` |
 
-> ⚠️ TODO — The KTP700 article number is not printed anywhere in these PDFs.
-> Read it off the panel (Control Panel → Device info) or from the TIA
-> hardware catalog and fill it into the root README.
+The panel's article number does not appear anywhere in these PDFs — TIA prints
+it for the CPU but not for the HMI device. The model designation `KTP700 Basic
+PN` identifies the panel unambiguously, so the order number is not recorded in
+this repository.
 
 The TIA Portal version is not printed either. It is **V16**, confirmed by the
 author and consistent with the `.ap16` project extension.

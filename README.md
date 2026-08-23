@@ -23,7 +23,6 @@ water-tank controller split across four function blocks.
 | Work memory | 50 KB |
 | On-board I/O | DI6 × 24 VDC sink/source, DQ4 × relay, AI2 (0..10 V, %IW64) |
 | Panel | SIMATIC KTP700 Basic PN, 7", 800 × 480 |
-| Panel article number | > ⚠️ TODO — not printed in the source PDFs |
 | Engineering software | TIA Portal V16 (STEP 7 Basic/Professional + WinCC Basic) |
 | Simulation | S7-PLCSIM (optional; CPU firmware ≥ 4.0 required) |
 | Programming language | LAD, all blocks |
