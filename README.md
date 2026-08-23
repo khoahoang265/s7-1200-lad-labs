@@ -56,12 +56,12 @@ water-tank controller split across four function blocks.
 | 1 | Alternating lamp with adjustable ON/OFF times | `S`/`R` latch, two `TON`, `MUL`/`DIV` scaling, HMI I/O fields | Logic documented · tests TODO | [labs/01-…](labs/01-alternating-lamp-timers/README.md) | > ⚠️ TODO |
 | 2 | Sequential three-lamp cycle | Timer chaining, ring sequence, three-lamp reset | Logic documented · tests TODO | [labs/02-…](labs/02-sequential-traffic-lights/README.md) | > ⚠️ TODO |
 | 3 | Cycle counter with automatic stop | `N` edge scan, `CTU`, `RESET_BF`, self-resetting counter | Logic documented · tests TODO | [labs/03-…](labs/03-counter-auto-stop/README.md) | > ⚠️ TODO |
-| 4 | Water tank — automatic and manual control | `FC` decomposition, non-optimized `DB`, `CTUD`, clock memory | Logic documented · **1 open defect** · tests TODO | [labs/04-…](labs/04-water-tank-auto-manual/README.md) | > ⚠️ TODO |
+| 4 | Water tank — automatic and manual control | `FC` decomposition, non-optimized `DB`, `CTUD`, clock memory | Logic documented · tests TODO | [labs/04-…](labs/04-water-tank-auto-manual/README.md) | > ⚠️ TODO |
 
 Read [`docs/extraction-notes.md#findings`](docs/extraction-notes.md#findings)
-before recording any demo — it lists the defects found while cross-checking
-the projects against the lab guide, including one in Lab 4 that stops the
-mode switch from working.
+before recording any demo — it lists what did not add up while cross-checking
+the projects against the lab guide: stale watch tables, inverted tag comments,
+mixed literal types, and one unfinished "Extra" task in Lab 3.
 
 ## Getting started
 

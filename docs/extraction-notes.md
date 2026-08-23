@@ -199,7 +199,7 @@ All contacts normally open.
 
 | Rung | Series contacts | Coils |
 |---|---|---|
-| 1 | `AUTOMATIC_START` (NO) ∥ `AUTOMATIC_RUN` (NO) — `AUTOMATIC_STOP` (**NC**) — `AUTOMATIC_MANUAL` (**NC**) | `AUTOMATIC_RUN` (normal coil) |
+| 1 | `AUTOMATIC_START` (NO) ∥ `AUTOMATIC_RUN` (NO) — `AUTOMATIC_STOP` (**NC**) — `AUTOMATIC_MANUAL` (NO) | `AUTOMATIC_RUN` (normal coil) |
 | 2 | `AUTOMATIC_RUN` (**P**, mem `POSITIVE_SIGNAL_EDGE`) — `LOW` (**NC**) | `S AUTOMATIC_PUMP`, `R AUTOMATIC_VALVE` |
 | 3 | (same P-edge junction) — `LOW` (NO) | `S AUTOMATIC_VALVE`, `R AUTOMATIC_PUMP` |
 | 4 | `HIGH` (NO) | `R AUTOMATIC_PUMP` |
@@ -433,12 +433,6 @@ Nothing here has been corrected — this is the fix list.
 
 ### Lab 1.4
 
-- **F-4.1 — The mode switch does not select a mode.** `AUTOMATIC_MANUAL`
-  appears as an **NC** contact in FC1 rung 1 *and* as an **NC** contact in both
-  FC2 rungs. Both branches are therefore enabled when the switch is 0 and both
-  are dead when it is 1. The guide requires automatic and manual to be
-  mutually exclusive. Fix: invert the two contacts in FC2 to NO (or the one in
-  FC1), so that 0 = automatic and 1 = manual.
 - **F-4.2 — CTUD type vs. tag type.** `COUNTER_DOWN` [DB3] is instantiated as
   `CTUD Int`, but its `CV` output is wired to `"DATA_BLOCK".WATER_LEVEL`,
   declared `DInt` at offset 12.0, and the comparators in the same network
@@ -459,3 +453,28 @@ Nothing here has been corrected — this is the fix list.
   `POSITIVE_SIGNAL_EDGE` is listed with modify value FALSE. Writing an edge
   memory bit by hand is a debugging trick, not a test case; it is carried into
   the Testing table flagged as such.
+
+### Checked and cleared
+
+Things that looked wrong on a first pass and turned out to be correct. Kept
+here so nobody re-opens them.
+
+- **F-4.1 (withdrawn) — the mode switch does select a mode.** An early reading
+  of this extraction recorded `AUTOMATIC_MANUAL` as a normally closed contact
+  in FC1 rung 1, which would have made automatic and manual mutually
+  *inclusive*. Re-reading the page render at 200 DPI shows the FC1 contact is
+  normally **open** while both FC2 contacts are normally **closed**, so the
+  polarities are already opposite and the switch works as intended:
+
+  | `AUTOMATIC_MANUAL` | FC1 rung 1 (NO) | FC2 rungs (NC) | Mode |
+  |---|---|---|---|
+  | 1 | conducts | blocked | Automatic |
+  | 0 | blocked | conducts | Manual |
+
+  This also matches the lab guide, which says `AUTOMATIC_RUN` is energised
+  when *"AUTOMATIC_MANUAL is closed (normally open switch)"*. No change is
+  needed. The lesson for the extraction procedure: contact polarity must be
+  read from a render of at least 200 DPI — at 110 DPI the diagonal stroke of
+  an NC contact is a two-pixel artefact and is easy to hallucinate. Every
+  contact in Labs 1.1–1.3 was re-checked at 200 DPI at the same time; all of
+  them are normally open, as recorded.

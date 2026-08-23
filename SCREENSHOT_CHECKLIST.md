@@ -69,9 +69,9 @@ points at these files yet, so an un-captured item leaves no broken image.
 | 18 | 4 | Compile 0/0 and download completed | Info → Compile, Load results | `labs/04-water-tank-auto-manual/img/compile-download.png` |
 | 19 | 4 | PLCSIM or the kit mid-cycle | PLCSIM / photo | `labs/04-water-tank-auto-manual/img/hardware.png` |
 
-> Capture 17 is only meaningful after **F-4.1** is fixed — as printed, setting
-> the mode switch disables both modes rather than switching to manual. Fix the
-> contact polarity in FC2 first, then capture.
+> For capture 17, remember the polarity: `AUTOMATIC_MANUAL = 0` is manual mode,
+> `= 1` is automatic. Frame the shot so both mode lamps are visible — it is the
+> clearest single image proving the two modes are mutually exclusive.
 
 ## Demo video shot list
 

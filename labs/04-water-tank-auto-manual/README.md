@@ -51,7 +51,7 @@ clock- and system-memory byte.
 
 | Address | Symbol | Data type | Description |
 |---|---|---|---|
-| %DB1.DBX0.0 | `AUTOMATIC_MANUAL` | Bool | Mode selector (see Notes — F-4.1) |
+| %DB1.DBX0.0 | `AUTOMATIC_MANUAL` | Bool | Mode selector — 1 = automatic, 0 = manual |
 | %DB1.DBX0.1 | `AUTOMATIC_START` | Bool | Automatic START button |
 | %DB1.DBX0.2 | `AUTOMATIC_STOP` | Bool | Automatic STOP button |
 | %DB1.DBX0.3 | `AUTOMATIC_RUN` | Bool | Automatic sequence is running |
@@ -76,7 +76,15 @@ clock- and system-memory byte.
 
 ## Control requirements
 
-1. `AUTOMATIC_MANUAL` selects between automatic and manual operation.
+1. `AUTOMATIC_MANUAL` selects between automatic and manual operation. The two
+   modes are mutually exclusive, enforced by opposite contact polarity in the
+   two blocks:
+
+   | `AUTOMATIC_MANUAL` | FC1 rung 1 (NO contact) | FC2 rungs (NC contacts) | Mode |
+   |---|---|---|---|
+   | 1 | conducts | blocked | Automatic |
+   | 0 | blocked | conducts | Manual |
+
 2. **Automatic:** START latches `AUTOMATIC_RUN`; STOP unlatches it.
 3. On the rising edge of `AUTOMATIC_RUN`, the tank's initial state decides the
    first move: if there is still old water in it, drain first; if it is
@@ -121,10 +129,16 @@ Seven rungs. All operands are `"DATA_BLOCK"` members.
 
 **Rung 1 — run latch.** `AUTOMATIC_START` (NO), paralleled by `AUTOMATIC_RUN`
 (NO) as the seal-in branch, in series with `AUTOMATIC_STOP` (NC) and
-`AUTOMATIC_MANUAL` (NC), drives the ordinary coil `AUTOMATIC_RUN`. This is a
+`AUTOMATIC_MANUAL` (NO), drives the ordinary coil `AUTOMATIC_RUN`. This is a
 classic seal-in latch built from a plain coil rather than S/R: the output's own
-contact holds the rung true after the button is released, and any NC contact
-downstream breaks it.
+contact holds the rung true after the button is released, and the NC stop
+contact breaks it.
+
+`AUTOMATIC_MANUAL` is normally **open** here and normally **closed** in both
+FC2 rungs. That opposite pairing is what makes the switch a selector: at 1 this
+rung conducts and FC2's rungs are dead (automatic mode), at 0 the reverse
+(manual mode). It matches the lab guide, which energises `AUTOMATIC_RUN` when
+*"AUTOMATIC_MANUAL is closed (normally open switch)"*.
 
 **Rung 2 — first move if the tank is empty.** A positive edge on
 `AUTOMATIC_RUN` (edge memory `POSITIVE_SIGNAL_EDGE`) in series with `LOW` (NC)
@@ -176,10 +190,10 @@ there is water to drain.
 
 ![FC2 MANUAL_MODE — two latched actuator controls with level interlocks](img/fc2-manual-mode.png)
 
-> The `AUTOMATIC_MANUAL` contacts in this block are normally closed, the same
-> polarity as in FC1 rung 1. That is the defect described in **F-4.1** below:
-> as printed, the switch enables both modes at once rather than choosing
-> between them.
+> Both `AUTOMATIC_MANUAL` contacts here are normally **closed**, the opposite
+> of the normally open one in FC1 rung 1. That is what makes the two modes
+> mutually exclusive rather than merely gated — see the table under Control
+> requirements.
 
 ### FC3 `MAP OUTPUT` — Network 1
 
@@ -264,7 +278,7 @@ Inputs are seeded from `Watch table_1` in the project.
 | 7 | Drain to 0 % | after test 6 | `WATER_LEVEL` falls to 0, `LOW = 0`, `AUTOMATIC_VALVE = 0` | > ⚠️ TODO | > ⚠️ TODO |
 | 8 | Dwell at 0 % | after test 7 | `TIMER2_DISPLAY` counts 0→5, then `AUTOMATIC_PUMP = 1` | > ⚠️ TODO | > ⚠️ TODO |
 | 9 | Automatic stop | `AUTOMATIC_STOP = FALSE`→pressed | `AUTOMATIC_RUN = 0`, `PUMP = 0`, `VALVE = 0` | > ⚠️ TODO | > ⚠️ TODO |
-| 10 | **Mode switch selects a mode (F-4.1)** | `AUTOMATIC_MANUAL = TRUE` | expected per the guide: automatic disabled, manual enabled. As printed, **both** are disabled | > ⚠️ TODO | > ⚠️ TODO |
+| 10 | Mode switch is exclusive | `AUTOMATIC_MANUAL = TRUE` | automatic enabled, manual dead; at FALSE the reverse | > ⚠️ TODO | > ⚠️ TODO |
 | 11 | Manual pump | mode = manual, `MANUAL_PUMP_START` | `PUMP = 1`, level rises | > ⚠️ TODO | > ⚠️ TODO |
 | 12 | Manual pump interlock | manual pump on, level reaches 100 | `MANUAL_PUMP = 0` — pump drops out | > ⚠️ TODO | > ⚠️ TODO |
 | 13 | Manual valve interlock | manual valve on, level reaches 0 | `MANUAL_VALVE = 0` — valve drops out | > ⚠️ TODO | > ⚠️ TODO |
@@ -285,11 +299,12 @@ Inputs are seeded from `Watch table_1` in the project.
 
 Carried over from [`docs/extraction-notes.md#findings`](../../docs/extraction-notes.md#findings):
 
-- **F-4.1 — open defect.** `AUTOMATIC_MANUAL` is a normally closed contact in
-  FC1 rung 1 *and* in both FC2 rungs. Both modes are therefore enabled when the
-  switch is 0 and both are dead when it is 1, so the switch does not select a
-  mode. Fix by inverting the two contacts in FC2 (or the one in FC1). Do this
-  before recording the demo.
+- **F-4.1 — withdrawn, not a defect.** An earlier revision of this document
+  claimed the mode switch could not select a mode. That was a misreading of the
+  page render: `AUTOMATIC_MANUAL` is normally **open** in FC1 and normally
+  **closed** in FC2, so the two modes are already mutually exclusive. Nothing
+  to fix. Kept on the record in
+  [`extraction-notes.md`](../../docs/extraction-notes.md#checked-and-cleared).
 - **F-4.2** `COUNTER_DOWN` [DB3] is a `CTUD Int` but its `CV` is wired to
   `WATER_LEVEL`, declared `DInt`, and the comparators treat it as `DInt`.
   Verify the project compiles clean; make the counter and the tag the same
