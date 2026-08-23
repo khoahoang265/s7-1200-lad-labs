@@ -140,9 +140,8 @@ Read from `… / Local modules`:
 > Read it off the panel (Control Panel → Device info) or from the TIA
 > hardware catalog and fill it into the root README.
 
-> ⚠️ TODO — The TIA Portal version is not printed either. The project files
-> on disk use the `.ap16` extension, which is TIA Portal V16; confirm before
-> publishing.
+The TIA Portal version is not printed either. It is **V16**, confirmed by the
+author and consistent with the `.ap16` project extension.
 
 ## Extracted logic
 

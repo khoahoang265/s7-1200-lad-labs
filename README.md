@@ -5,7 +5,7 @@ KTP700 Basic PN panel, built for the Industrial Automation laboratory course.
 The series walks from a set/reset latch with two timers up to a mode-switched
 water-tank controller split across four function blocks.
 
-`TIA Portal V16 (unconfirmed)` · `S7-1200 · CPU 1211C AC/DC/Rly · FW V4.4` ·
+`TIA Portal V16` · `S7-1200 · CPU 1211C AC/DC/Rly · FW V4.4` ·
 `LAD` · `WinCC Basic / KTP700 Basic PN` · `4 labs`
 
 > Every ladder network, tag table and HMI screenshot in this repository was
@@ -24,7 +24,7 @@ water-tank controller split across four function blocks.
 | On-board I/O | DI6 × 24 VDC sink/source, DQ4 × relay, AI2 (0..10 V, %IW64) |
 | Panel | SIMATIC KTP700 Basic PN, 7", 800 × 480 |
 | Panel article number | > ⚠️ TODO — not printed in the source PDFs |
-| Engineering software | TIA Portal — > ⚠️ TODO confirm version (project files are `.ap16`, i.e. V16) |
+| Engineering software | TIA Portal V16 (STEP 7 Basic/Professional + WinCC Basic) |
 | Simulation | S7-PLCSIM (optional; CPU firmware ≥ 4.0 required) |
 | Programming language | LAD, all blocks |
 
@@ -34,6 +34,7 @@ water-tank controller split across four function blocks.
 .
 ├── README.md                        this file
 ├── SCREENSHOT_CHECKLIST.md          what still has to be captured by hand
+├── LICENSE                          MIT
 ├── .gitignore                       TIA-aware; commit .zap, never the .ap16 folder
 ├── docs/
 │   ├── setup.md                     retrieve, compile, download, simulate
@@ -102,8 +103,13 @@ Full walkthrough, including the IP settings and the PLCSIM caveats, is in
 
 ## Author
 
-> ⚠️ TODO — name, student ID, course code, semester, institution.
+**Hoàng Minh Khoa** — student ID 10223035
+Industrial Automation Lab
 
 ## License
 
-MIT. > ⚠️ TODO — add a `LICENSE` file with the copyright line filled in.
+Released under the MIT License — see [`LICENSE`](LICENSE).
+
+The lab exercises and the accompanying course guide are the property of the
+course; this repository covers the implementation and the documentation
+written for it.

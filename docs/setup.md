@@ -10,10 +10,10 @@ How to get any of the four labs running, on real hardware or in simulation.
 | TIA Portal — WinCC Basic | the KTP700 panel (WinCC Basic covers Basic Panels) |
 | S7-PLCSIM | optional; running without a CPU |
 
-> ⚠️ TODO — confirm the TIA Portal version. The projects on disk use the
-> `.ap16` extension, which is TIA Portal V16. A project can be opened by a
-> newer TIA Portal (it will upgrade it, irreversibly) but never by an older
-> one, so record the version you used.
+These projects were built in **TIA Portal V16** — hence the `.ap16` /
+`.zap16` extensions. A newer TIA Portal will open them, but it upgrades the
+project irreversibly and the archive can then no longer be retrieved on V16.
+An older TIA Portal cannot open them at all.
 
 PLCSIM only works with S7-1200 CPUs whose firmware is **V4.0 or newer**. The
 CPU in these projects is FW V4.4, so simulation is available.
