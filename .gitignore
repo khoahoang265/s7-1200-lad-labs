@@ -1,0 +1,74 @@
+# --------------------------------------------------------------------------
+# TIA Portal repository policy
+#
+# COMMIT:  the archive produced by  Project > Archive  (*.zap16, *.zap17, ...)
+#          It is one self-contained file and it is what another engineer needs
+#          in order to run  Project > Retrieve  and get a working project.
+#
+# NEVER COMMIT: the live project folder (*.ap16 / *.ap17 / ... and everything
+#          under it). It is a binary working directory with lock files,
+#          per-machine caches, compile output and a search index. It changes
+#          on every open, it does not merge, and it is several hundred MB.
+#
+# If a .zap ever exceeds 100 MB, GitHub will reject the push. Use Git LFS:
+#     git lfs install
+#     git lfs track "*.zap16"
+#     git add .gitattributes
+#     git add labs/<lab>/src/<project>.zap16
+#     git commit -m "Add archived TIA project via LFS"
+# --------------------------------------------------------------------------
+
+# Live TIA Portal project directories -- never commit these
+*.ap1[0-9]/
+*.ap[0-9][0-9]/
+*.ap1[0-9]
+*.ap[0-9][0-9]
+*.al[0-9][0-9]
+
+# TIA working directories, wherever they appear
+Logs/
+TMP/
+System/
+Vci/
+XRef/
+IM/
+AdditionalFiles/
+UserFiles/
+**/SearchIndex/
+**/PEData/
+*.plf
+*.idx
+*.db
+~$*
+~PEData.*
+
+# TIA / WinCC scratch
+*.bak
+*.tmp
+*.temp
+*.s7pbak
+*.wbak
+
+# Simulation
+*.sim1[0-9]
+Simulation/
+
+# Keep the archives -- they are the deliverable
+!*.zap1[0-9]
+!*.zap[0-9][0-9]
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS cruft
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
